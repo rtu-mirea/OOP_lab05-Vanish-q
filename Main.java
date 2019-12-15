@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.rmi.server.ExportException;
 
 public class Main {
 
@@ -58,6 +59,13 @@ public class Main {
         //Admin window
 
         JFrame adminWindow = new JFrame("Admin");
+
+        JTextArea questionList = new JTextArea();
+        JLabel questionNumberLabel = new JLabel("Номер вопроса");
+        JTextField questionNamber = new JTextField();
+        JButton changeQuestion = new JButton("Заменить вопрос");
+        JButton delete = new JButton("Удалить вопрос");
+
         JLabel questionLabel = new JLabel("Вопрос");
         JTextField questionText = new JTextField();
         JLabel answerLabel = new JLabel("Ответ на вопрос");
@@ -65,18 +73,40 @@ public class Main {
         JButton addQuestion = new JButton("Добавить вопрос");
         JButton exiteAdmin = new JButton("Выйти из системы");
 
+        JScrollPane scroll = new JScrollPane(questionList,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+
         JPanel adminPanel = new JPanel();
-        adminPanel.setLayout(new GridLayout(6, 1));
+        adminPanel.setLayout(new GridLayout(11, 1));
 
         adminWindow.add(adminPanel);
+
+        //adminPanel.add(questionList);
+        //questionList.add(scroll);
+        adminPanel.add(scroll);
+        adminPanel.add(questionNumberLabel);
+        adminPanel.add(questionNamber);
+
         adminPanel.add(questionLabel);
         adminPanel.add(questionText);
         adminPanel.add(answerLabel);
         adminPanel.add(answerText);
         adminPanel.add(addQuestion);
+
+        adminPanel.add(changeQuestion);
+        adminPanel.add(delete);
+
         adminPanel.add(exiteAdmin);
 
         adminWindow.pack();
+
+        scroll.setVisible(false);
+        //questionList.setVisible(false);
+        questionNamber.setVisible(false);
+        questionNumberLabel.setVisible(false);
+
 
         // User window
 
@@ -95,7 +125,7 @@ public class Main {
         userPanel.add(exiteUser);
 
         userWindow.pack();
-
+        
         logButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -158,6 +188,7 @@ public class Main {
                         nameText.setVisible(false);
                         repPasswordLabel.setVisible(false);
                         repPasswordText.setVisible(false);
+                        logButton.setVisible(true);
                         nameText.setText("");
                         loginText.setText("");
                         passwordText.setText("");
@@ -172,6 +203,7 @@ public class Main {
                     nameText.setVisible(true);
                     repPasswordLabel.setVisible(true);
                     repPasswordText.setVisible(true);
+                    logButton.setVisible(false);
                 }
             }
         });
@@ -196,6 +228,97 @@ public class Main {
                 }
                 catch (Exception ex){
                     JOptionPane.showMessageDialog(frame, ex.getMessage());
+                }
+            }
+        });
+        changeQuestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(questionNamber.isVisible()){
+                    try {
+                        ObjectInputStream in = new ObjectInputStream(new FileInputStream("dataBase.txt"));
+                        DistanceExaminator distanceExaminator = (DistanceExaminator)in.readObject();
+                        in.close();
+
+                        distanceExaminator.changeQuestion(Integer.parseInt(questionNamber.getText()), questionText.getText(), answerText.getText());
+                        JOptionPane.showMessageDialog(frame, "Вопрос успешно изменен");
+
+                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("dataBase.txt"));
+                        out.writeObject(distanceExaminator);
+                        out.close();
+
+                        questionText.setText("");
+                        answerText.setText("");
+                        scroll.setVisible(false);
+                        //questionList.setVisible(false);
+                        questionNamber.setVisible(false);
+                        questionNumberLabel.setVisible(false);
+                    }
+                    catch (Exception ex){
+                        JOptionPane.showMessageDialog(frame, ex.getMessage());
+                    }
+                }
+                else{
+                    try {
+                        ObjectInputStream in = new ObjectInputStream(new FileInputStream("dataBase.txt"));
+                        DistanceExaminator distanceExaminator = (DistanceExaminator) in.readObject();
+                        in.close();
+                        scroll.setVisible(true);
+                        //questionList.setVisible(true);
+                        questionNamber.setVisible(true);
+                        questionNumberLabel.setVisible(true);
+                        questionList.setText(distanceExaminator.getAllQuestions());
+                    }
+                    catch (Exception ex){
+                        JOptionPane.showMessageDialog(frame, ex.getMessage());
+
+                    }
+                }
+            }
+        });
+        delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(questionNamber.isVisible()){
+                    try {
+                        ObjectInputStream in = new ObjectInputStream(new FileInputStream("dataBase.txt"));
+                        DistanceExaminator distanceExaminator = (DistanceExaminator)in.readObject();
+                        in.close();
+
+                        //distanceExaminator.changeQuestion(Integer.parseInt(questionNamber.getText()), questionText.getText(), answerText.getText());
+                        distanceExaminator.deleteQuestion(Integer.parseInt(questionNamber.getText()));
+                        JOptionPane.showMessageDialog(frame, "Вопрос успешно удален");
+
+                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("dataBase.txt"));
+                        out.writeObject(distanceExaminator);
+                        out.close();
+
+                        questionText.setText("");
+                        answerText.setText("");
+                        scroll.setVisible(false);
+                        //questionList.setVisible(false);
+                        questionNamber.setVisible(false);
+                        questionNumberLabel.setVisible(false);
+                    }
+                    catch (Exception ex){
+                        JOptionPane.showMessageDialog(frame, ex.getMessage());
+                    }
+                }
+                else{
+                    try {
+                        ObjectInputStream in = new ObjectInputStream(new FileInputStream("dataBase.txt"));
+                        DistanceExaminator distanceExaminator = (DistanceExaminator) in.readObject();
+                        in.close();
+                        scroll.setVisible(true);
+                        //questionList.setVisible(true);
+                        questionNamber.setVisible(true);
+                        questionNumberLabel.setVisible(true);
+                        questionList.setText(distanceExaminator.getAllQuestions());
+                    }
+                    catch (Exception ex){
+                        JOptionPane.showMessageDialog(frame, ex.getMessage());
+
+                    }
                 }
             }
         });

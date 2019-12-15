@@ -15,6 +15,7 @@ public class DistanceExaminator implements Serializable {
         return curreantUser;
     }
     public void addUser(String name, String login, String password, String repeatPassword) throws Exception{
+        if (login.compareTo("") == 0 || password.compareTo("") == 0) throw new Exception("Заполните все данные");
         if (password.compareTo(repeatPassword) != 0) throw new Exception("Пароли не совпадают");
         if (login.compareTo(admin.getLogin()) == 0) throw new Exception("Данный логин уде занят");
         if (students.isEmpty()){
@@ -75,6 +76,23 @@ public class DistanceExaminator implements Serializable {
             questions.add(new Question(question, answer));
         }
         else throw new Exception("Вы не имеете парв на добавление вопросов");
+    }
+    public void changeQuestion(int i, String question, String answer) throws Exception{
+        if (question.compareTo("") == 0 || answer.compareTo("") == 0)
+        if (curreantUser == -1) {
+            questions.set(i, new Question(question, answer));
+        }
+        else throw new Exception("Вы не имеете парв на добавление вопросов");
+    }
+    public void deleteQuestion(int i){
+        questions.remove(i);
+    }
+    public String getAllQuestions(){
+        String res = "Cписок вопросов\n";
+        for (int i = 0; i < questions.size(); i++){
+            res += "Вопрос №" + i + " : " + questions.get(i).getQuestin() + "\nОтвет: " + questions.get(i).getAnswer() + '\n';
+        }
+        return res;
     }
     public void examination()throws Exception{
         int questionIndex, arr[] = {-1,-1,-1,-1,-1};

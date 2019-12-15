@@ -15,4 +15,5 @@ public class Question  implements Serializable {
     public String getQuestin() {
         return questin;
     }
+    public String getAnswer(){return questionAnswers;}
 }
